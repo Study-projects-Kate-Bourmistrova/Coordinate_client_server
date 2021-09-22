@@ -3,7 +3,42 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+
+class WCL implements Runnable{
+    Socket cs;
+    int count = 0;
+    public WCL(Socket cs, int count){
+        this.cs = cs;
+        this.count = count;
+    }
+    @Override
+    public void run() {
+        InputStream is = null;
+        OutputStream os = null;
+        DataInputStream dis;
+        DataOutputStream dos;
+
+        try {
+            is = cs.getInputStream();
+            os = cs.getOutputStream();
+            dis = new DataInputStream(is);
+            dos = new DataOutputStream(os);
+
+            String name = dis.readUTF();
+            System.out.println("Client № " + count + " named " + name);
+
+            dos.writeUTF("Hello " + name + "!");
+
+            cs.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+}
 public class Server {
     int port = 8000;
     InetAddress host;
@@ -14,6 +49,7 @@ public class Server {
     DataInputStream dis;
     DataOutputStream dos;
     public Server() {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
         try {
             host = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
@@ -22,20 +58,19 @@ public class Server {
         try {
             serverSocket = new ServerSocket(port,0,host);
             System.out.println("Server started");
-            clientSocket = serverSocket.accept();
-            System.out.println("Client connected");
-            is = clientSocket.getInputStream();
-            os = clientSocket.getOutputStream();
-            dis = new DataInputStream(is);
-            dos = new DataOutputStream(os);
+            int count = 0;
 
-            String name = dis.readUTF();
-            System.out.println("Client " + name);
+            while(true) {
+                clientSocket = serverSocket.accept();
 
-            dos.writeUTF("Hello " + name + "!");
+                count++;
+                System.out.println("Client connected");
 
-            clientSocket.close();
-            serverSocket.close();
+                WCL task = new WCL(clientSocket,count);
+                executor.submit(task);
+
+            }
+            //serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
