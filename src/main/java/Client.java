@@ -12,7 +12,7 @@ public class Client {
     OutputStream os;
     DataInputStream dis;
     DataOutputStream dos;
-
+    Coordinate coord = new Coordinate(0,0); // get from the sever when created instead
     public Client(){
         try {
             host = InetAddress.getLocalHost();
@@ -27,7 +27,11 @@ public class Client {
             dis = new DataInputStream(is);
             dos = new DataOutputStream(os);
 
-            dos.writeUTF("Kate");
+            coord.setX_coordinate(5);
+            coord.setY_coordinate(205);
+
+            //dos.writeUTF("Kate");
+            dos.writeUTF(coord.toString());
             String ans = dis.readUTF();
             System.out.println("Ans : " + ans);
             clientSocket.close();
