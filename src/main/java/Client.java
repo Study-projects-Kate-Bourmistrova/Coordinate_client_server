@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -31,7 +34,10 @@ public class Client {
             coord.setY_coordinate(205);
 
             //dos.writeUTF("Kate");
-            dos.writeUTF(coord.toString());
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String obj = gson.toJson(coord);
+
+            dos.writeUTF(obj);
             String ans = dis.readUTF();
             System.out.println("Ans : " + ans);
             clientSocket.close();
