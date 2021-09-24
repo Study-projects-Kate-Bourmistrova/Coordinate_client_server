@@ -1,5 +1,5 @@
 public class Coordinate {
-    //int id = -1;
+    int id = -1;
     int x_coordinate;
     int y_coordinate;
 

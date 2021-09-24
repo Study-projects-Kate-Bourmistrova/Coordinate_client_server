@@ -38,8 +38,11 @@ public class Client {
             String obj = gson.toJson(coord);
 
             dos.writeUTF(obj);
+
             String ans = dis.readUTF();
-            System.out.println("Ans : " + ans);
+            Coordinate coord2 = gson.fromJson(ans, Coordinate.class);
+
+            System.out.println("Ans : " + coord2);
             clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();

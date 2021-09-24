@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -65,6 +68,8 @@ public class Server {
             DataOutputStream dos;
 
             try {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
                 is = cs.getInputStream();
                 os = cs.getOutputStream();
                 dis = new DataInputStream(is);
@@ -72,8 +77,14 @@ public class Server {
 
                 String coordinates = dis.readUTF();
                 System.out.println("Client № " + count + " is here");
+                //System.out.println("Json : " + coordinates);
 
-                dos.writeUTF("Got coordinates: " + coordinates + "!");
+                Coordinate coord = gson.fromJson(coordinates,Coordinate.class);
+                //String to_send = gson.toJson(coordinates);
+
+                coord.id = count;
+                System.out.println("Json2 : " + gson.toJson(coord));
+                dos.writeUTF(gson.toJson(coord));
 
                 cs.close();
             } catch (IOException e) {
